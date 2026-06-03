@@ -31,7 +31,11 @@ fun MainScreen() {
 
     Scaffold(
         bottomBar = {
-            if (currentDestination?.route != Screen.Splash.route) {
+            val hideBottomBar = currentDestination?.route == Screen.Splash.route ||
+                    currentDestination?.route == Screen.Login.route ||
+                    currentDestination?.route == Screen.Register.route
+
+            if (!hideBottomBar) {
                 NavigationBar {
                     items.forEach { screen ->
                         NavigationBarItem(

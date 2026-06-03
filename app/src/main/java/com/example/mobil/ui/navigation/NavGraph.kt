@@ -5,11 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.mobil.ui.screens.DashboardScreen
-import com.example.mobil.ui.screens.NotificationFormScreen
-import com.example.mobil.ui.screens.ProfileScreen
-import com.example.mobil.ui.screens.RecommendationsScreen
-import com.example.mobil.ui.screens.SplashScreen
+import com.example.mobil.ui.screens.*
 
 @Composable
 fun NavGraph(
@@ -23,10 +19,29 @@ fun NavGraph(
     ) {
         composable(Screen.Splash.route) {
             SplashScreen(onNavigateToDashboard = {
-                navController.navigate(Screen.Dashboard.route) {
+                navController.navigate(Screen.Login.route) {
                     popUpTo(Screen.Splash.route) { inclusive = true }
                 }
             })
+        }
+        composable(Screen.Login.route) {
+            LoginScreen(
+                onNavigateToDashboard = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route)
+                }
+            )
+        }
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                onNavigateToLogin = {
+                    navController.popBackStack()
+                }
+            )
         }
         composable(Screen.Dashboard.route) {
             DashboardScreen()
