@@ -3,8 +3,10 @@ package com.example.mobil.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.mobil.ui.screens.*
 
 @Composable
@@ -44,10 +46,20 @@ fun NavGraph(
             )
         }
         composable(Screen.Dashboard.route) {
-            DashboardScreen()
+            DashboardScreen(onNavigateToNotification = { lat, lng ->
+                navController.navigate(Screen.NotificationForm.createRoute(lat, lng))
+            })
         }
-        composable(Screen.NotificationForm.route) {
-            NotificationFormScreen()
+        composable(
+            route = Screen.NotificationForm.route,
+            arguments = listOf(
+                navArgument("lat") { type = NavType.StringType; defaultValue = "" },
+                navArgument("lng") { type = NavType.StringType; defaultValue = "" }
+            )
+        ) { backStackEntry ->
+            val lat = backStackEntry.arguments?.getString("lat") ?: ""
+            val lng = backStackEntry.arguments?.getString("lng") ?: ""
+            NotificationFormScreen(locationInfo = if (lat.isNotEmpty()) "$lat, $lng" else "")
         }
         composable(Screen.Recommendations.route) {
             RecommendationsScreen()

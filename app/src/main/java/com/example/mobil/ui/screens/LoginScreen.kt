@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,54 +37,76 @@ fun LoginScreen(
         }
     }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Giriş Yap") }) }
-    ) { innerPadding ->
-        Column(
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        ElevatedCard(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(24.dp)
+                .fillMaxWidth(),
+            shape = MaterialTheme.shapes.extraLarge
         ) {
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("E-mail (@gmail.com)") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = sifre,
-                onValueChange = { sifre = it },
-                label = { Text("Şifre") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                enabled = !isLoading
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { viewModel.login(email, sifre) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
+            Column(
+                modifier = Modifier.padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                if (isLoading) CircularProgressIndicator(size = 24.dp)
-                else Text("Giriş Yap")
-            }
-            TextButton(onClick = onNavigateToRegister) {
-                Text("Hesabınız yok mu? Kayıt Olun")
+                Text(
+                    text = "Hoş Geldiniz",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Text(
+                    text = "Giriş yaparak çevreyi korumaya başlayın",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("E-mail") },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                )
+
+                OutlinedTextField(
+                    value = sifre,
+                    onValueChange = { sifre = it },
+                    label = { Text("Şifre") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                )
+
+                Button(
+                    onClick = { viewModel.login(email, sifre) },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Giriş Yap")
+                    }
+                }
+
+                TextButton(onClick = onNavigateToRegister) {
+                    Text("Hesabınız yok mu? Kayıt Olun")
+                }
             }
         }
     }
-}
-
-@Composable
-fun CircularProgressIndicator(size: androidx.compose.ui.unit.Dp) {
-    androidx.compose.material3.CircularProgressIndicator(
-        modifier = Modifier.size(size),
-        strokeWidth = 2.dp,
-        color = MaterialTheme.colorScheme.onPrimary
-    )
 }

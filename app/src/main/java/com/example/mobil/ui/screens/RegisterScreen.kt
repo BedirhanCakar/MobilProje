@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,69 +43,95 @@ fun RegisterScreen(
         }
     }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Kayıt Ol") }) }
-    ) { innerPadding ->
-        Column(
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        ElevatedCard(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(24.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = MaterialTheme.shapes.extraLarge
         ) {
-            OutlinedTextField(
-                value = ad,
-                onValueChange = { ad = it },
-                label = { Text("Ad") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = soyad,
-                onValueChange = { soyad = it },
-                label = { Text("Soyad") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("E-mail (@gmail.com)") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = sifre,
-                onValueChange = { sifre = it },
-                label = { Text("Şifre (Min 8 Karakter)") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                enabled = !isLoading
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = sifreTekrar,
-                onValueChange = { sifreTekrar = it },
-                label = { Text("Şifre Tekrar") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                enabled = !isLoading
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { viewModel.register(ad, soyad, email, sifre, sifreTekrar) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                else Text("Kayıt Ol")
-            }
-            TextButton(onClick = onNavigateToLogin) {
-                Text("Zaten hesabınız var mı? Giriş Yapın")
+                Text(
+                    text = "Yeni Hesap Oluştur",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                OutlinedTextField(
+                    value = ad,
+                    onValueChange = { ad = it },
+                    label = { Text("Ad") },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                )
+                OutlinedTextField(
+                    value = soyad,
+                    onValueChange = { soyad = it },
+                    label = { Text("Soyad") },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("E-mail (@gmail.com)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                )
+                OutlinedTextField(
+                    value = sifre,
+                    onValueChange = { sifre = it },
+                    label = { Text("Şifre") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                )
+                OutlinedTextField(
+                    value = sifreTekrar,
+                    onValueChange = { sifreTekrar = it },
+                    label = { Text("Şifre Tekrar") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = { viewModel.register(ad, soyad, email, sifre, sifreTekrar) },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    enabled = !isLoading,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Kayıt Ol")
+                    }
+                }
+                TextButton(onClick = onNavigateToLogin) {
+                    Text("Zaten hesabınız var mı? Giriş Yapın")
+                }
             }
         }
     }

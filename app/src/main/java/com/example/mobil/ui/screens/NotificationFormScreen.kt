@@ -10,8 +10,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobil.ui.viewmodel.NotificationViewModel
@@ -19,9 +21,11 @@ import com.example.mobil.util.NotificationHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationFormScreen(viewModel: NotificationViewModel = viewModel()) {
+fun NotificationFormScreen(
+    locationInfo: String = "",
+    viewModel: NotificationViewModel = viewModel()
+) {
     val context = LocalContext.current
-    var boxId by remember { mutableStateOf("") }
     var wasteType by remember { mutableStateOf("") }
     var userNote by remember { mutableStateOf("") }
 
@@ -34,8 +38,8 @@ fun NotificationFormScreen(viewModel: NotificationViewModel = viewModel()) {
             if (isGranted) {
                 NotificationHelper.showNotification(
                     context,
-                    "Başarılı",
-                    "İhbarınız sisteme kaydedildi."
+                    "Yeni Bildirim",
+                    "Yeni bir atık var, hadi hemen çevreyi koruyalım!"
                 )
             }
         }
@@ -49,12 +53,10 @@ fun NotificationFormScreen(viewModel: NotificationViewModel = viewModel()) {
                 } else {
                     NotificationHelper.showNotification(
                         context,
-                        "Başarılı",
-                        "İhbarınız sisteme kaydedildi."
+                        "Yeni Bildirim",
+                        "Yeni bir atık var, hadi hemen çevreyi koruyalım!"
                     )
                 }
-                // Formu temizle
-                boxId = ""
                 wasteType = ""
                 userNote = ""
             } else {
@@ -65,67 +67,81 @@ fun NotificationFormScreen(viewModel: NotificationViewModel = viewModel()) {
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Atık Bildirim Formu") })
-        }
+        topBar = { TopAppBar(title = { Text("Atık Bildirimi Gönder") }) }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Lütfen ihbar detaylarını doldurunuz.",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            OutlinedTextField(
-                value = boxId,
-                onValueChange = { boxId = it },
-                label = { Text("Kutu ID") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isSubmitting
-            )
-
-            OutlinedTextField(
-                value = wasteType,
-                onValueChange = { wasteType = it },
-                label = { Text("Atık Tipi") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isSubmitting
-            )
-
-            OutlinedTextField(
-                value = userNote,
-                onValueChange = { userNote = it },
-                label = { Text("Kullanıcı Notu") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 3,
-                enabled = !isSubmitting
-            )
-
-            Button(
-                onClick = {
-                    val id = boxId.toIntOrNull()
-                    if (id != null) {
-                        viewModel.sendIhbar(id, userNote)
-                    } else {
-                        Toast.makeText(context, "Geçerli bir Kutu ID giriniz!", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isSubmitting
+            ElevatedCard(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                shape = MaterialTheme.shapes.large
             ) {
-                if (isSubmitting) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "İhbar Detayları",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
                     )
-                } else {
-                    Text("İhbarı Gönder")
+
+                    OutlinedTextField(
+                        value = locationInfo,
+                        onValueChange = { },
+                        label = { Text("Seçilen Konum (Kutu ID)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false,
+                        readOnly = true
+                    )
+
+                    OutlinedTextField(
+                        value = wasteType,
+                        onValueChange = { wasteType = it },
+                        label = { Text("Atık Tipi") },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isSubmitting
+                    )
+
+                    OutlinedTextField(
+                        value = userNote,
+                        onValueChange = { userNote = it },
+                        label = { Text("Kullanıcı Notu") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 3,
+                        enabled = !isSubmitting
+                    )
+
+                    Button(
+                        onClick = {
+                            if (locationInfo.isNotEmpty() && wasteType.isNotEmpty()) {
+                                viewModel.sendIhbar(1, userNote) // Demo ID: 1
+                            } else {
+                                Toast.makeText(context, "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isSubmitting,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        if (isSubmitting) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text("Bildirimi Gönder")
+                        }
+                    }
                 }
             }
         }

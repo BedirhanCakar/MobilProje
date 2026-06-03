@@ -9,48 +9,74 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen() {
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Kullanıcı Profili") })
-        }
+        topBar = { TopAppBar(title = { Text("Profil") }) }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null,
-                modifier = Modifier.size(100.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(text = "Bedirhan", style = MaterialTheme.typography.headlineMedium)
-            Text(text = "bedirhan@example.com", style = MaterialTheme.typography.bodyLarge)
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            StatRow(icon = Icons.Default.Star, label = "Toplam Puan", value = "1250")
-            StatRow(icon = Icons.Default.Star, label = "Yapılan İhbarlar", value = "12")
-            StatRow(icon = Icons.Default.Star, label = "Geri Kazanılan Atık", value = "45kg")
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            OutlinedButton(
-                onClick = { /* Ayarlar */ },
-                modifier = Modifier.fillMaxWidth()
+            ElevatedCard(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+                shape = MaterialTheme.shapes.extraLarge
             ) {
-                Text("Profil Ayarları")
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Surface(
+                        modifier = Modifier.size(100.dp),
+                        shape = MaterialTheme.shapes.extraLarge,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxSize(),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Text(
+                        text = "Bedirhan", 
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "bedirhan@gmail.com", 
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    StatRow(icon = Icons.Default.Star, label = "Toplam Puan", value = "1250")
+                    StatRow(icon = Icons.Default.Star, label = "Yapılan İhbarlar", value = "12")
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    Button(
+                        onClick = { },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Text("Ayarları Düzenle")
+                    }
+                }
             }
         }
     }
@@ -58,24 +84,18 @@ fun ProfileScreen() {
 
 @Composable
 fun StatRow(icon: ImageVector, label: String, value: String) {
-    Card(
+    Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 8.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = label)
-            }
-            Text(text = value, style = MaterialTheme.typography.titleMedium)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(text = label, style = MaterialTheme.typography.bodyLarge)
         }
+        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
     }
 }

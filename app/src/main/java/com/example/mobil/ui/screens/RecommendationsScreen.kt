@@ -5,7 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 data class Recommendation(val title: String, val description: String)
@@ -17,23 +19,30 @@ fun RecommendationsScreen() {
         Recommendation("Kağıt Geri Dönüşümü", "Kağıtları geri dönüştürerek ağaçları koruyabilirsiniz."),
         Recommendation("Plastik Atıklar", "Plastik şişeleri durulamadan çöpe atmayın."),
         Recommendation("Cam Atıklar", "Cam sonsuz kez geri dönüştürülebilir bir malzemedir."),
-        Recommendation("Elektronik Atıklar", "E-atıkları normal çöpe atmayın, özel toplama noktalarına bırakın."),
+        Recommendation("Elektronik Atıklar", "E-atıkları özel toplama noktalarına bırakın."),
         Recommendation("Pil Atıkları", "Atık piller toprak ve su kirliliğine neden olur."),
         Recommendation("Gıda Atıkları", "Gıda atıklarından kompost gübre yaparak toprağı zenginleştirin.")
     )
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Geri Dönüşüm Tavsiyeleri") })
-        }
+        topBar = { TopAppBar(title = { Text("Tavsiyeler") }) }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            item {
+                Text(
+                    text = "Daha Yeşil Bir Dünya İçin",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
             items(recommendations) { item ->
                 RecommendationCard(item)
             }
@@ -43,14 +52,23 @@ fun RecommendationsScreen() {
 
 @Composable
 fun RecommendationCard(recommendation: Recommendation) {
-    Card(
+    ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = MaterialTheme.shapes.medium
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = recommendation.title, style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = recommendation.description, style = MaterialTheme.typography.bodyMedium)
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                text = recommendation.title, 
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = recommendation.description, 
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
