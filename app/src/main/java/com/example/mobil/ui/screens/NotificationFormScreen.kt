@@ -1,19 +1,39 @@
 package com.example.mobil.ui.screens
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.mobil.util.NotificationHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationFormScreen() {
+    val context = LocalContext.current
     var boxId by remember { mutableStateOf("") }
     var wasteType by remember { mutableStateOf("") }
     var userNote by remember { mutableStateOf("") }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                NotificationHelper.showNotification(
+                    context,
+                    "Başarılı",
+                    "İhbarınız sisteme kaydedildi."
+                )
+            }
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -56,7 +76,17 @@ fun NotificationFormScreen() {
             )
 
             Button(
-                onClick = { /* TODO: Step 5'te bildirim ve servis entegrasyonu */ },
+                onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        NotificationHelper.showNotification(
+                            context,
+                            "Başarılı",
+                            "İhbarınız sisteme kaydedildi."
+                        )
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("İhbarı Gönder")
