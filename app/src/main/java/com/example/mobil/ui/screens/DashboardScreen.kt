@@ -11,10 +11,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mobil.data.model.Kutu
+import com.example.mobil.ui.viewmodel.HomeViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -23,13 +25,15 @@ import com.google.maps.android.compose.*
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(viewModel: HomeViewModel = viewModel()) {
     val context = LocalContext.current
+    val kutular by viewModel.kutular.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    
     var hasLocationPermission by remember { mutableStateOf(false) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     
-    // Default position (Istanbul)
-    var cameraPositionState = rememberCameraPositionState {
+    val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(41.0082, 28.9784), 10f)
     }
 
@@ -68,8 +72,8 @@ fun DashboardScreen() {
             TopAppBar(
                 title = { Text("Mobil Atık Takip") },
                 actions = {
-                    IconButton(onClick = { /* Ara */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "Ara")
+                    IconButton(onClick = { viewModel.fetchKutular() }) {
+                        Icon(Icons.Default.Search, contentDescription = "Yenile")
                     }
                 }
             )
@@ -80,7 +84,6 @@ fun DashboardScreen() {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Google Maps Alanı
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -92,12 +95,17 @@ fun DashboardScreen() {
                     properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
                     uiSettings = MapUiSettings(myLocationButtonEnabled = true)
                 ) {
-                    // Örnek Marker'lar (Backend entegrasyonunda dinamikleşecek)
-                    Marker(
-                        state = MarkerState(position = LatLng(41.0082, 28.9784)),
-                        title = "Örnek Kutu",
-                        snippet = "Doluluk: %60"
-                    )
+                    kutular.forEach { kutu ->
+                        Marker(
+                            state = rememberMarkerState(position = LatLng(kutu.lat, kutu.lng)),
+                            title = "${kutu.tip} Kutusu",
+                            snippet = "Doluluk: %${kutu.dolulukOrani}"
+                        )
+                    }
+                }
+                
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
                 }
             }
 
@@ -111,14 +119,12 @@ fun DashboardScreen() {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            val dummyBoxes = listOf("Plastik", "Kağıt", "Cam", "Metal")
-
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(dummyBoxes) { type ->
-                    KutuCard(type)
+                items(kutular) { kutu ->
+                    KutuCard(kutu)
                 }
             }
         }
@@ -126,16 +132,16 @@ fun DashboardScreen() {
 }
 
 @Composable
-fun KutuCard(type: String) {
+fun KutuCard(kutu: Kutu) {
     Card(
         modifier = Modifier.width(150.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = type, style = MaterialTheme.typography.titleMedium)
-            Text(text = "%60 Dolu", style = MaterialTheme.typography.bodySmall)
+            Text(text = kutu.tip, style = MaterialTheme.typography.titleMedium)
+            Text(text = "%${kutu.dolulukOrani} Dolu", style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(8.dp))
             LinearProgressIndicator(
-                progress = { 0.6f },
+                progress = { kutu.dolulukOrani / 100f },
                 modifier = Modifier.fillMaxWidth()
             )
         }
