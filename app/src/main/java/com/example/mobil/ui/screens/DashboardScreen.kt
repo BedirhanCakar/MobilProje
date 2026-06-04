@@ -75,10 +75,12 @@ fun DashboardScreen(
             text = { Text("Bu konumu işaretlemek istediğinizden emin misiniz?") },
             confirmButton = {
                 Button(onClick = {
-                    showConfirmDialog = false
+                    val lat = tempLocation!!.latitude
+                    val lng = tempLocation!!.longitude
                     viewModel.setSelectedLocation(tempLocation)
-                    onNavigateToNotification(tempLocation!!.latitude, tempLocation!!.longitude)
+                    showConfirmDialog = false
                     tempLocation = null
+                    onNavigateToNotification(lat, lng)
                 }) { Text("Evet") }
             },
             dismissButton = {
