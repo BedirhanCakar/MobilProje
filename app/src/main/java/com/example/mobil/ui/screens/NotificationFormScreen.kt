@@ -23,6 +23,7 @@ import com.example.mobil.util.NotificationHelper
 @Composable
 fun NotificationFormScreen(
     locationInfo: String = "",
+    onNavigateBack: () -> Unit = {},
     viewModel: NotificationViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -38,7 +39,7 @@ fun NotificationFormScreen(
             if (isGranted) {
                 NotificationHelper.showNotification(
                     context,
-                    "Yeni Bildirim",
+                    "Mobil Atık Takip",
                     "Yeni bir atık var, hadi hemen çevreyi koruyalım!"
                 )
             }
@@ -48,17 +49,19 @@ fun NotificationFormScreen(
     LaunchedEffect(submitSuccess) {
         submitSuccess?.let { success ->
             if (success) {
+                Toast.makeText(context, "Bildirim başarıyla gönderildi!", Toast.LENGTH_SHORT).show()
+                
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 } else {
                     NotificationHelper.showNotification(
                         context,
-                        "Yeni Bildirim",
+                        "Mobil Atık Takip",
                         "Yeni bir atık var, hadi hemen çevreyi koruyalım!"
                     )
                 }
-                wasteType = ""
-                userNote = ""
+                
+                onNavigateBack() // Haritaya yönlendir
             } else {
                 Toast.makeText(context, "Bir hata oluştu!", Toast.LENGTH_SHORT).show()
             }
@@ -97,7 +100,7 @@ fun NotificationFormScreen(
                     OutlinedTextField(
                         value = locationInfo,
                         onValueChange = { },
-                        label = { Text("Seçilen Konum (Kutu ID)") },
+                        label = { Text("Seçilen Konum") },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = false,
                         readOnly = true
@@ -123,7 +126,7 @@ fun NotificationFormScreen(
                     Button(
                         onClick = {
                             if (locationInfo.isNotEmpty() && wasteType.isNotEmpty()) {
-                                viewModel.sendIhbar(1, userNote) // Demo ID: 1
+                                viewModel.sendIhbar(1, userNote)
                             } else {
                                 Toast.makeText(context, "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show()
                             }

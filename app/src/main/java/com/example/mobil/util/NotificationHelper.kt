@@ -9,7 +9,7 @@ import com.example.mobil.R
 
 object NotificationHelper {
     private const val CHANNEL_ID = "waste_notification_channel"
-    private const val CHANNEL_NAME = "Atık Bildirimleri"
+    private const val CHANNEL_NAME = "Mobil Atık Takip"
 
     fun showNotification(context: Context, title: String, message: String) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -20,8 +20,8 @@ object NotificationHelper {
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Standart ikon kullanıldı
-            .setContentTitle(title)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Mobil Atık Takip") // Uygulama adı yapıldı
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
