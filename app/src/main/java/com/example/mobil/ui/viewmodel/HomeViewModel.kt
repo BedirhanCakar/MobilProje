@@ -15,8 +15,15 @@ class HomeViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _selectedLocation = MutableStateFlow<com.google.android.gms.maps.model.LatLng?>(null)
+    val selectedLocation: StateFlow<com.google.android.gms.maps.model.LatLng?> = _selectedLocation
+
     init {
         fetchKutular()
+    }
+
+    fun setSelectedLocation(latLng: com.google.android.gms.maps.model.LatLng?) {
+        _selectedLocation.value = latLng
     }
 
     fun fetchKutular() {
