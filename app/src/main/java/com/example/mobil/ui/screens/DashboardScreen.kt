@@ -154,14 +154,14 @@ fun DashboardScreen(
                         title = "Seçtiğiniz Konum",
                         icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
                         onClick = {
-                            showDeleteDialog = true
-                            true
+                            // Marker'a tıklandığında silme bildirimi gelmesin (Kullanıcı isteği)
+                            false // Varsayılan davranışı göster (başlığı açar)
                         }
                     )
                 }
             }
 
-            // Seçimi Sil Butonu (Harita üzerinde, sağ altta)
+            // Seçimi Sil Butonu (Harita üzerinde, sol altta)
             if (selectedLocation != null) {
                 ExtendedFloatingActionButton(
                     onClick = { showDeleteDialog = true },
@@ -170,7 +170,7 @@ fun DashboardScreen(
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.error,
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.BottomStart) // Sola taşındı
                         .padding(16.dp)
                 )
             }

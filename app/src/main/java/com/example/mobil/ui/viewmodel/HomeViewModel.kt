@@ -34,12 +34,8 @@ class HomeViewModel : ViewModel() {
                 // val result = RetrofitClient.apiService.getKutular()
                 // _kutular.value = result
                 
-                // Demo verisi
-                _kutular.value = listOf(
-                    Kutu(1, "Plastik", 60, 41.0082, 28.9784),
-                    Kutu(2, "Kağıt", 30, 41.0182, 28.9884),
-                    Kutu(3, "Cam", 85, 41.0282, 28.9684)
-                )
+                // Demo verisi kaldırıldı (Kullanıcı isteği üzerine)
+                _kutular.value = emptyList()
             } catch (e: Exception) {
                 // Hata yönetimi eklenebilir
             } finally {
