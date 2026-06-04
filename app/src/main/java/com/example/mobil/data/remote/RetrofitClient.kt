@@ -4,7 +4,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://your-api-endpoint.com/api/" // Gerçek API URL'i ile değiştirilmeli
+    // Ücretsiz Mock API Servisi
+    private const val BASE_URL = "https://run.mocky.io/v3/"
 
     val apiService: ApiService by lazy {
         Retrofit.Builder()

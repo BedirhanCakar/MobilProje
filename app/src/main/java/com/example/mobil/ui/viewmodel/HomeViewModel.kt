@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobil.data.model.Kutu
 import com.example.mobil.data.model.UserMarker
+import com.example.mobil.data.remote.RetrofitClient
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,11 +17,9 @@ class HomeViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    // Kullanıcının eklediği detaylı işaretçiler listesi
     private val _userMarkers = MutableStateFlow<List<UserMarker>>(emptyList())
     val userMarkers: StateFlow<List<UserMarker>> = _userMarkers
 
-    // Şu an seçili olan işaretçinin ID'si
     private val _selectedMarkerId = MutableStateFlow<String?>(null)
     val selectedMarkerId: StateFlow<String?> = _selectedMarkerId
 
@@ -32,7 +31,6 @@ class HomeViewModel : ViewModel() {
         val currentList = _userMarkers.value.toMutableList()
         currentList.add(UserMarker(position = latLng, wasteType = wasteType))
         _userMarkers.value = currentList
-        _selectedMarkerId.value = null 
     }
 
     fun selectMarker(id: String) {
@@ -57,9 +55,12 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _kutular.value = emptyList()
+                // GERÇEK API ÇAĞRISI: Şu an bu URL rastgele kutular döndürecek şekilde ayarlandı
+                // Eğer URL hata verirse boş liste dönecektir.
+                val result = RetrofitClient.apiService.getKutular()
+                _kutular.value = result
             } catch (e: Exception) {
-                // Hata yönetimi
+                _kutular.value = emptyList()
             } finally {
                 _isLoading.value = false
             }
