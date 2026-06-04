@@ -7,13 +7,17 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobil.ui.screens.*
+import com.example.mobil.ui.viewmodel.HomeViewModel
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val homeViewModel: HomeViewModel = viewModel()
+    
     NavHost(
         navController = navController,
         startDestination = Screen.Splash.route,
@@ -46,9 +50,12 @@ fun NavGraph(
             )
         }
         composable(Screen.Dashboard.route) {
-            DashboardScreen(onNavigateToNotification = { lat, lng ->
-                navController.navigate(Screen.NotificationForm.createRoute(lat, lng))
-            })
+            DashboardScreen(
+                onNavigateToNotification = { lat, lng ->
+                    navController.navigate(Screen.NotificationForm.createRoute(lat, lng))
+                },
+                viewModel = homeViewModel
+            )
         }
         composable(
             route = Screen.NotificationForm.route,
@@ -63,7 +70,8 @@ fun NavGraph(
                 locationInfo = if (lat.isNotEmpty()) "$lat, $lng" else "",
                 onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
+                homeViewModel = homeViewModel
             )
         }
         composable(Screen.Recommendations.route) {

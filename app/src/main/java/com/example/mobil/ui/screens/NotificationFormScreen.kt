@@ -16,22 +16,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mobil.ui.viewmodel.HomeViewModel
 import com.example.mobil.ui.viewmodel.NotificationViewModel
 import com.example.mobil.util.NotificationHelper
+import com.google.android.gms.maps.model.LatLng
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationFormScreen(
     locationInfo: String = "",
     onNavigateBack: () -> Unit = {},
-    viewModel: NotificationViewModel = viewModel()
+    notificationViewModel: NotificationViewModel = viewModel(),
+    homeViewModel: HomeViewModel = viewModel()
 ) {
     val context = LocalContext.current
     var wasteType by remember { mutableStateOf("") }
     var userNote by remember { mutableStateOf("") }
 
-    val isSubmitting by viewModel.isSubmitting.collectAsState()
-    val submitSuccess by viewModel.submitSuccess.collectAsState()
+    val isSubmitting by notificationViewModel.isSubmitting.collectAsState()
+    val submitSuccess by notificationViewModel.submitSuccess.collectAsState()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -51,6 +54,18 @@ fun NotificationFormScreen(
             if (success) {
                 Toast.makeText(context, "Bildirim başarıyla gönderildi!", Toast.LENGTH_SHORT).show()
                 
+                // Haritaya yeni işaretçiyi ekle
+                if (locationInfo.isNotEmpty()) {
+                    val coords = locationInfo.split(",")
+                    if (coords.size == 2) {
+                        val lat = coords[0].trim().toDoubleOrNull()
+                        val lng = coords[1].trim().toDoubleOrNull()
+                        if (lat != null && lng != null) {
+                            homeViewModel.addMarker(LatLng(lat, lng), wasteType)
+                        }
+                    }
+                }
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 } else {
@@ -61,11 +76,11 @@ fun NotificationFormScreen(
                     )
                 }
                 
-                onNavigateBack() // Haritaya yönlendir
+                onNavigateBack()
             } else {
                 Toast.makeText(context, "Bir hata oluştu!", Toast.LENGTH_SHORT).show()
             }
-            viewModel.resetStatus()
+            notificationViewModel.resetStatus()
         }
     }
 
@@ -126,7 +141,7 @@ fun NotificationFormScreen(
                     Button(
                         onClick = {
                             if (locationInfo.isNotEmpty() && wasteType.isNotEmpty()) {
-                                viewModel.sendIhbar(1, userNote)
+                                notificationViewModel.sendIhbar(1, userNote)
                             } else {
                                 Toast.makeText(context, "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show()
                             }

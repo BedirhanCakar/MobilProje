@@ -3,6 +3,7 @@ package com.example.mobil.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobil.data.model.Kutu
+import com.example.mobil.data.model.UserMarker
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,42 +16,41 @@ class HomeViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    // Kullanıcının eklediği işaretçiler listesi
-    private val _userMarkers = MutableStateFlow<List<LatLng>>(emptyList())
-    val userMarkers: StateFlow<List<LatLng>> = _userMarkers
+    // Kullanıcının eklediği detaylı işaretçiler listesi
+    private val _userMarkers = MutableStateFlow<List<UserMarker>>(emptyList())
+    val userMarkers: StateFlow<List<UserMarker>> = _userMarkers
 
-    // Şu an seçili olan işaretçinin indeksi
-    private val _selectedIndex = MutableStateFlow<Int?>(null)
-    val selectedIndex: StateFlow<Int?> = _selectedIndex
+    // Şu an seçili olan işaretçinin ID'si
+    private val _selectedMarkerId = MutableStateFlow<String?>(null)
+    val selectedMarkerId: StateFlow<String?> = _selectedMarkerId
 
     init {
         fetchKutular()
     }
 
-    fun addMarker(latLng: LatLng) {
+    fun addMarker(latLng: LatLng, wasteType: String) {
         val currentList = _userMarkers.value.toMutableList()
-        currentList.add(latLng)
+        currentList.add(UserMarker(position = latLng, wasteType = wasteType))
         _userMarkers.value = currentList
-        // Yeni eklenen otomatik seçilsin mi? Kullanıcı tıkladığında seçilsin dediği için null bırakıyoruz.
-        _selectedIndex.value = null 
+        _selectedMarkerId.value = null 
     }
 
-    fun selectMarker(index: Int) {
-        _selectedIndex.value = index
+    fun selectMarker(id: String) {
+        _selectedMarkerId.value = id
     }
 
     fun deleteSelectedMarker() {
-        val index = _selectedIndex.value
-        if (index != null && index in _userMarkers.value.indices) {
+        val id = _selectedMarkerId.value
+        if (id != null) {
             val currentList = _userMarkers.value.toMutableList()
-            currentList.removeAt(index)
+            currentList.removeAll { it.id == id }
             _userMarkers.value = currentList
-            _selectedIndex.value = null // Silindikten sonra seçimi sıfırla
+            _selectedMarkerId.value = null
         }
     }
 
     fun clearSelection() {
-        _selectedIndex.value = null
+        _selectedMarkerId.value = null
     }
 
     fun fetchKutular() {

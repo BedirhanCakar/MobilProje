@@ -32,7 +32,7 @@ fun DashboardScreen(
     val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsState()
     val userMarkers by viewModel.userMarkers.collectAsState()
-    val selectedIndex by viewModel.selectedIndex.collectAsState()
+    val selectedMarkerId by viewModel.selectedMarkerId.collectAsState()
     
     var hasLocationPermission by remember { mutableStateOf(false) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
@@ -77,10 +77,10 @@ fun DashboardScreen(
                 Button(onClick = {
                     val lat = tempLocation!!.latitude
                     val lng = tempLocation!!.longitude
-                    viewModel.addMarker(tempLocation!!)
                     showConfirmDialog = false
-                    tempLocation = null
+                    // addMarker artık NotificationFormScreen içinde yapılıyor
                     onNavigateToNotification(lat, lng)
+                    tempLocation = null
                 }) { Text("Evet") }
             },
             dismissButton = {
@@ -133,31 +133,30 @@ fun DashboardScreen(
                 properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
                 uiSettings = MapUiSettings(myLocationButtonEnabled = true),
                 onMapClick = { latLng ->
-                    viewModel.clearSelection() // Boş yere tıklayınca seçimi kaldır
+                    viewModel.clearSelection()
                     tempLocation = latLng
                     showConfirmDialog = true
                 }
             ) {
                 // Kullanıcının eklediği işaretçiler
-                userMarkers.forEachIndexed { index, location ->
-                    val isSelected = selectedIndex == index
+                userMarkers.forEach { marker ->
+                    val isSelected = selectedMarkerId == marker.id
                     Marker(
-                        state = rememberMarkerState(key = location.toString() + isSelected, position = location),
-                        title = "İşaretli Konum ${index + 1}",
-                        // Seçilen Mavi (Azure), Seçilmeyen Kırmızı (Red)
+                        state = rememberMarkerState(key = marker.id + isSelected, position = marker.position),
+                        title = marker.wasteType,
                         icon = BitmapDescriptorFactory.defaultMarker(
                             if (isSelected) BitmapDescriptorFactory.HUE_AZURE else BitmapDescriptorFactory.HUE_RED
                         ),
                         onClick = {
-                            viewModel.selectMarker(index)
-                            false // Başlık (info window) gösterilsin
+                            viewModel.selectMarker(marker.id)
+                            false
                         }
                     )
                 }
             }
 
             // Seçiliyi Sil Butonu (Sol Altta)
-            if (selectedIndex != null) {
+            if (selectedMarkerId != null) {
                 ExtendedFloatingActionButton(
                     onClick = { showDeleteDialog = true },
                     icon = { Icon(Icons.Default.Delete, contentDescription = null) },
