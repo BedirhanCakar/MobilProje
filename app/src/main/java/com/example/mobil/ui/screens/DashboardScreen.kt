@@ -140,18 +140,20 @@ fun DashboardScreen(
             ) {
                 // Kullanıcının eklediği işaretçiler
                 userMarkers.forEach { marker ->
-                    val isSelected = selectedMarkerId == marker.id
-                    Marker(
-                        state = rememberMarkerState(key = marker.id + isSelected, position = marker.position),
-                        title = marker.wasteType,
-                        icon = BitmapDescriptorFactory.defaultMarker(
-                            if (isSelected) BitmapDescriptorFactory.HUE_AZURE else BitmapDescriptorFactory.HUE_RED
-                        ),
-                        onClick = {
-                            viewModel.selectMarker(marker.id)
-                            false
-                        }
-                    )
+                    key(marker.id) {
+                        val isSelected = selectedMarkerId == marker.id
+                        Marker(
+                            state = rememberMarkerState(position = marker.position),
+                            title = marker.wasteType,
+                            icon = BitmapDescriptorFactory.defaultMarker(
+                                if (isSelected) BitmapDescriptorFactory.HUE_AZURE else BitmapDescriptorFactory.HUE_RED
+                            ),
+                            onClick = {
+                                viewModel.selectMarker(marker.id)
+                                false
+                            }
+                        )
+                    }
                 }
             }
 
