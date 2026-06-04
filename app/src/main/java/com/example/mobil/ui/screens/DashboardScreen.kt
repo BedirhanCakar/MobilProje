@@ -30,9 +30,8 @@ fun DashboardScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val kutular by viewModel.kutular.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val selectedLocation by viewModel.selectedLocation.collectAsState()
+    val selectedLocations by viewModel.selectedLocations.collectAsState()
     
     var hasLocationPermission by remember { mutableStateOf(false) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
@@ -77,7 +76,7 @@ fun DashboardScreen(
                 Button(onClick = {
                     val lat = tempLocation!!.latitude
                     val lng = tempLocation!!.longitude
-                    viewModel.setSelectedLocation(tempLocation)
+                    viewModel.addSelectedLocation(tempLocation!!)
                     showConfirmDialog = false
                     tempLocation = null
                     onNavigateToNotification(lat, lng)
@@ -97,10 +96,10 @@ fun DashboardScreen(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             title = { Text("İşaretçiyi Sil") },
-            text = { Text("Bu işaretçiyi kaldırmak istediğinizden emin misiniz?") },
+            text = { Text("Son eklediğiniz işaretçiyi kaldırmak istediğinizden emin misiniz?") },
             confirmButton = {
                 Button(onClick = {
-                    viewModel.setSelectedLocation(null)
+                    viewModel.removeLastLocation()
                     showDeleteDialog = false
                 }) { Text("Evet") }
             },
@@ -137,41 +136,27 @@ fun DashboardScreen(
                     showConfirmDialog = true
                 }
             ) {
-                // Mevcut Kutular (Turuncu yapıldı ki karışmasın)
-                kutular.forEach { kutu ->
+                // Seçilen Konumlar (Mavi İşaretçiler)
+                selectedLocations.forEachIndexed { index, location ->
                     Marker(
-                        state = rememberMarkerState(position = LatLng(kutu.lat, kutu.lng)),
-                        title = "${kutu.tip} Kutusu",
-                        snippet = "Doluluk: %${kutu.dolulukOrani}",
-                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
-                    )
-                }
-
-                // Seçilen Konum (Mavi İşaretçi)
-                selectedLocation?.let { location ->
-                    Marker(
-                        state = rememberMarkerState(position = location),
-                        title = "Seçtiğiniz Konum",
-                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
-                        onClick = {
-                            // Marker'a tıklandığında silme bildirimi gelmesin (Kullanıcı isteği)
-                            false // Varsayılan davranışı göster (başlığı açar)
-                        }
+                        state = rememberMarkerState(key = location.toString(), position = location),
+                        title = "İşaretli Konum ${index + 1}",
+                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
                     )
                 }
             }
 
-            // Seçimi Sil Butonu (Harita üzerinde, sol altta)
-            if (selectedLocation != null) {
+            // Seçimi Sil Butonu (Harita üzerinde, sol altta, Navigasyon Bar'ın üstünde)
+            if (selectedLocations.isNotEmpty()) {
                 ExtendedFloatingActionButton(
                     onClick = { showDeleteDialog = true },
                     icon = { Icon(Icons.Default.Delete, contentDescription = null) },
-                    text = { Text("Seçimi Sil") },
+                    text = { Text("Son Seçimi Sil") },
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.error,
                     modifier = Modifier
-                        .align(Alignment.BottomStart) // Sola taşındı
-                        .padding(16.dp)
+                        .align(Alignment.BottomStart)
+                        .padding(start = 16.dp, bottom = 16.dp)
                 )
             }
             
