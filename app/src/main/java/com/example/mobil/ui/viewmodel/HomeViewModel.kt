@@ -15,33 +15,48 @@ class HomeViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    // Çoklu işaretçi için liste yapısına geçildi
-    private val _selectedLocations = MutableStateFlow<List<LatLng>>(emptyList())
-    val selectedLocations: StateFlow<List<LatLng>> = _selectedLocations
+    // Kullanıcının eklediği işaretçiler listesi
+    private val _userMarkers = MutableStateFlow<List<LatLng>>(emptyList())
+    val userMarkers: StateFlow<List<LatLng>> = _userMarkers
+
+    // Şu an seçili olan işaretçinin indeksi
+    private val _selectedIndex = MutableStateFlow<Int?>(null)
+    val selectedIndex: StateFlow<Int?> = _selectedIndex
 
     init {
         fetchKutular()
     }
 
-    fun addSelectedLocation(latLng: LatLng) {
-        val currentList = _selectedLocations.value.toMutableList()
+    fun addMarker(latLng: LatLng) {
+        val currentList = _userMarkers.value.toMutableList()
         currentList.add(latLng)
-        _selectedLocations.value = currentList
+        _userMarkers.value = currentList
+        // Yeni eklenen otomatik seçilsin mi? Kullanıcı tıkladığında seçilsin dediği için null bırakıyoruz.
+        _selectedIndex.value = null 
     }
 
-    fun removeLastLocation() {
-        val currentList = _selectedLocations.value.toMutableList()
-        if (currentList.isNotEmpty()) {
-            currentList.removeAt(currentList.size - 1)
-            _selectedLocations.value = currentList
+    fun selectMarker(index: Int) {
+        _selectedIndex.value = index
+    }
+
+    fun deleteSelectedMarker() {
+        val index = _selectedIndex.value
+        if (index != null && index in _userMarkers.value.indices) {
+            val currentList = _userMarkers.value.toMutableList()
+            currentList.removeAt(index)
+            _userMarkers.value = currentList
+            _selectedIndex.value = null // Silindikten sonra seçimi sıfırla
         }
+    }
+
+    fun clearSelection() {
+        _selectedIndex.value = null
     }
 
     fun fetchKutular() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Demo verisi boşaltıldı
                 _kutular.value = emptyList()
             } catch (e: Exception) {
                 // Hata yönetimi

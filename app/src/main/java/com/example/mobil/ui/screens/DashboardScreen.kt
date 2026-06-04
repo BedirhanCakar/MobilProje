@@ -31,7 +31,8 @@ fun DashboardScreen(
 ) {
     val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsState()
-    val selectedLocations by viewModel.selectedLocations.collectAsState()
+    val userMarkers by viewModel.userMarkers.collectAsState()
+    val selectedIndex by viewModel.selectedIndex.collectAsState()
     
     var hasLocationPermission by remember { mutableStateOf(false) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
@@ -66,7 +67,7 @@ fun DashboardScreen(
         }
     }
 
-    // Konum Seçme Onay Diyaloğu
+    // Yeni Konum Ekleme Onay Diyaloğu
     if (showConfirmDialog && tempLocation != null) {
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
@@ -76,7 +77,7 @@ fun DashboardScreen(
                 Button(onClick = {
                     val lat = tempLocation!!.latitude
                     val lng = tempLocation!!.longitude
-                    viewModel.addSelectedLocation(tempLocation!!)
+                    viewModel.addMarker(tempLocation!!)
                     showConfirmDialog = false
                     tempLocation = null
                     onNavigateToNotification(lat, lng)
@@ -96,10 +97,10 @@ fun DashboardScreen(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             title = { Text("İşaretçiyi Sil") },
-            text = { Text("Son eklediğiniz işaretçiyi kaldırmak istediğinizden emin misiniz?") },
+            text = { Text("Seçili işaretçiyi kaldırmak istediğinizden emin misiniz?") },
             confirmButton = {
                 Button(onClick = {
-                    viewModel.removeLastLocation()
+                    viewModel.deleteSelectedMarker()
                     showDeleteDialog = false
                 }) { Text("Evet") }
             },
@@ -132,26 +133,35 @@ fun DashboardScreen(
                 properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
                 uiSettings = MapUiSettings(myLocationButtonEnabled = true),
                 onMapClick = { latLng ->
+                    viewModel.clearSelection() // Boş yere tıklayınca seçimi kaldır
                     tempLocation = latLng
                     showConfirmDialog = true
                 }
             ) {
-                // Seçilen Konumlar (Mavi İşaretçiler)
-                selectedLocations.forEachIndexed { index, location ->
+                // Kullanıcının eklediği işaretçiler
+                userMarkers.forEachIndexed { index, location ->
+                    val isSelected = selectedIndex == index
                     Marker(
-                        state = rememberMarkerState(key = location.toString(), position = location),
+                        state = rememberMarkerState(key = location.toString() + isSelected, position = location),
                         title = "İşaretli Konum ${index + 1}",
-                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+                        // Seçilen Mavi (Azure), Seçilmeyen Kırmızı (Red)
+                        icon = BitmapDescriptorFactory.defaultMarker(
+                            if (isSelected) BitmapDescriptorFactory.HUE_AZURE else BitmapDescriptorFactory.HUE_RED
+                        ),
+                        onClick = {
+                            viewModel.selectMarker(index)
+                            false // Başlık (info window) gösterilsin
+                        }
                     )
                 }
             }
 
-            // Seçimi Sil Butonu (Harita üzerinde, sol altta, Navigasyon Bar'ın üstünde)
-            if (selectedLocations.isNotEmpty()) {
+            // Seçiliyi Sil Butonu (Sol Altta)
+            if (selectedIndex != null) {
                 ExtendedFloatingActionButton(
                     onClick = { showDeleteDialog = true },
                     icon = { Icon(Icons.Default.Delete, contentDescription = null) },
-                    text = { Text("Son Seçimi Sil") },
+                    text = { Text("Seçiliyi Sil") },
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.error,
                     modifier = Modifier
