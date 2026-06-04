@@ -32,6 +32,8 @@ fun NotificationFormScreen(
     val context = LocalContext.current
     var wasteType by remember { mutableStateOf("") }
     var userNote by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    val wasteOptions = listOf("Plastik", "Karton", "Metal", "Cam", "Elektronik", "Diğer")
 
     val isSubmitting by notificationViewModel.isSubmitting.collectAsState()
     val submitSuccess by notificationViewModel.submitSuccess.collectAsState()
@@ -121,13 +123,40 @@ fun NotificationFormScreen(
                         readOnly = true
                     )
 
-                    OutlinedTextField(
-                        value = wasteType,
-                        onValueChange = { wasteType = it },
-                        label = { Text("Atık Tipi") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isSubmitting
-                    )
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { if (!isSubmitting) expanded = !expanded },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = wasteType,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Atık Tipi Seçin") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            enabled = !isSubmitting,
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            wasteOptions.forEach { selectionOption ->
+                                DropdownMenuItem(
+                                    text = { Text(selectionOption) },
+                                    onClick = {
+                                        wasteType = selectionOption
+                                        expanded = false
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                )
+                            }
+                        }
+                    }
 
                     OutlinedTextField(
                         value = userNote,
