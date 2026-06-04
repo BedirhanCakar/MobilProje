@@ -59,13 +59,24 @@ fun NavGraph(
         ) { backStackEntry ->
             val lat = backStackEntry.arguments?.getString("lat") ?: ""
             val lng = backStackEntry.arguments?.getString("lng") ?: ""
-            NotificationFormScreen(locationInfo = if (lat.isNotEmpty()) "$lat, $lng" else "")
+            NotificationFormScreen(
+                locationInfo = if (lat.isNotEmpty()) "$lat, $lng" else "",
+                onNavigateBack = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Dashboard.route) { inclusive = true }
+                    }
+                }
+            )
         }
         composable(Screen.Recommendations.route) {
             RecommendationsScreen()
         }
         composable(Screen.Profile.route) {
-            ProfileScreen()
+            ProfileScreen(onLogout = {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            })
         }
     }
 }
