@@ -137,12 +137,13 @@ fun DashboardScreen(
                     showConfirmDialog = true
                 }
             ) {
-                // Mevcut Kutular (Kırmızı)
+                // Mevcut Kutular (Turuncu yapıldı ki karışmasın)
                 kutular.forEach { kutu ->
                     Marker(
                         state = rememberMarkerState(position = LatLng(kutu.lat, kutu.lng)),
                         title = "${kutu.tip} Kutusu",
-                        snippet = "Doluluk: %${kutu.dolulukOrani}"
+                        snippet = "Doluluk: %${kutu.dolulukOrani}",
+                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
                     )
                 }
 
@@ -160,7 +161,7 @@ fun DashboardScreen(
                 }
             }
 
-            // Seçimi Sil Butonu (Sadece konum seçiliyse görünür)
+            // Seçimi Sil Butonu (Harita üzerinde, sağ altta)
             if (selectedLocation != null) {
                 ExtendedFloatingActionButton(
                     onClick = { showDeleteDialog = true },

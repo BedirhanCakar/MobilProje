@@ -62,9 +62,7 @@ fun NavGraph(
             NotificationFormScreen(
                 locationInfo = if (lat.isNotEmpty()) "$lat, $lng" else "",
                 onNavigateBack = {
-                    navController.navigate(Screen.Dashboard.route) {
-                        popUpTo(Screen.Dashboard.route) { inclusive = true }
-                    }
+                    navController.popBackStack()
                 }
             )
         }
