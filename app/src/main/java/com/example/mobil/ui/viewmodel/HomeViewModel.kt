@@ -55,8 +55,6 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // GERÇEK API ÇAĞRISI: Şu an bu URL rastgele kutular döndürecek şekilde ayarlandı
-                // Eğer URL hata verirse boş liste dönecektir.
                 val result = RetrofitClient.apiService.getKutular()
                 _kutular.value = result
             } catch (e: Exception) {

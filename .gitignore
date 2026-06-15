@@ -1,15 +1,30 @@
+# Gradle files
+.gradle/
+build/
+
+# Kotlin / KMP
+.kotlin/
+kotlin-js-store/
+
+# Android Studio / IntelliJ
 *.iml
-.gradle
-/local.properties
+.idea/
+local.properties
 secrets.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# SQLite / Database
+*.db-shm
+*.db-wal
+
+# KSP
+*.ksp
+
+# OS files
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+Thumbs.db
+
+# Modules
+**/build/
