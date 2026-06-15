@@ -32,5 +32,5 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { HealthViewModel(get()) }
+    viewModel { HealthViewModel(get(), get()) }
 }
